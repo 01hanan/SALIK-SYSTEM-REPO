@@ -12,7 +12,7 @@ import supervision as sv
 import argparse
 import base64
 from tracker import Tracker
-
+import geocoder
 
 def send_sms(cam, image_file, className, conf):
 
@@ -94,7 +94,14 @@ def main():
     tracker = Tracker()
     colors = [(0, 0, 255) for _ in range(10)]  # Red bounding boxes
 
-    
+    # Get the current location based on the IP address
+    location = geocoder.ip('me')
+
+    # Access the latitude and longitude
+    latitude = location.latlng[0]
+    longitude = location.latlng[1]
+
+    google_maps_link = f"https://www.google.com/maps?q={latitude},{longitude}"
 
     classNames = ["Pothole"]
 
@@ -190,7 +197,7 @@ def main():
                         last_sms_time[track_id] = current_time  # Update the last SMS send time
                         image_filename = "pothole_image.jpg"
                         cv2.imwrite(image_filename, frame)  # Save the image to a file
-                        send_sms("#Makkah Region", image_filename, class_name, confidence)
+                        send_sms(google_maps_link, image_filename, class_name, confidence)
                                         
 
             cv2.imshow("YOLOv8 Detection", frame)
